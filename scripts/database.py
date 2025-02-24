@@ -3,24 +3,38 @@ import os
 import pandas as pd
 from dotenv import load_dotenv
 
-# Load environment variables from .env file
-load_dotenv()
+# Load environment variables from .env file (for local) or GitHub Secrets (for cloud)
+if os.path.exists(".env"):
+    load_dotenv()
 
 MONGO_URI = os.getenv("MONGO_URI")
 
 if not MONGO_URI:
-    raise ValueError("ERROR: MONGO_URI is not set. Add it to your .env file!")
+    raise ValueError("🚨 ERROR: MONGO_URI is not set. Add it to your .env file or GitHub Secrets!")
 
-# Connect to MongoDB
-client = pymongo.MongoClient(MONGO_URI)
-db = client["FakeNewsDB"]
-collection = db["PolitifactClaims"]
+try:
+    client = pymongo.MongoClient(MONGO_URI)
+    db = client["FakeNewsDB"]
+    collection = db["PolitifactClaims"]
+    print("✅ Connected to MongoDB Atlas!")
+except pymongo.errors.ConnectionFailure as e:
+    print(f"🚨 Connection failed: {e}")
+    exit()
 
-# Load data
-df = pd.read_csv("data/new_tweets_predictions.csv")
+csv_path = "data/new_tweets_predictions.csv"
 
-# Convert dataframe to MongoDB format
-documents = df.to_dict(orient="records")
-collection.insert_many(documents)
+if not os.path.exists(csv_path):
+    raise FileNotFoundError(f"🚨 ERROR: {csv_path} not found!")
 
-print("Data inserted into MongoDB!")
+df = pd.read_csv(csv_path)
+
+if df.empty:
+    print("WARNING: No data found in CSV. Nothing to insert.")
+else:
+    documents = df.to_dict(orient="records")
+    
+    if collection.count_documents({}) > 0:
+        print("WARNING: Collection already contains data. Skipping insertion to prevent duplicates.")
+    else:
+        collection.insert_many(documents)
+        print(f"Inserted {len(documents)} records into MongoDB!")
