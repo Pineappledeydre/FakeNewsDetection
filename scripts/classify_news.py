@@ -1,8 +1,10 @@
 import torch
 import torch.nn as nn
 from transformers import BertTokenizer, BertModel
-import pandas as pd
+from database import collection  # MongoDB integration
+from preprocess import preprocess
 
+# Define the BERT classification model
 class BertClassifier(nn.Module):
     """Fake news detection model using BERT."""
     def __init__(self, dropout=0.3):
@@ -14,29 +16,29 @@ class BertClassifier(nn.Module):
 
     def forward(self, input_ids, attention_mask):
         outputs = self.bert(input_ids=input_ids, attention_mask=attention_mask)
-        pooled_output = outputs.pooler_output
-        dropout_output = self.dropout(pooled_output)
-        return self.sigmoid(self.fc(dropout_output))
+        return self.sigmoid(self.fc(self.dropout(outputs.pooler_output)))
 
-# Load pretrained model
+# Load trained model
 model = BertClassifier()
-model.load_state_dict(torch.load("models/bert_trained_model.pth", map_location=torch.device('cpu')))
+model.load_state_dict(torch.load("models/bert_finetuned_model.pth", map_location=torch.device('cpu')))
 model.eval()
 
 tokenizer = BertTokenizer.from_pretrained("bert-base-uncased")
 
-# Load scraped data
-df = pd.read_csv("data/covid_politifact_claims.csv")
+# Process and classify each document
+for doc in collection.find({"PredictedLabel": {"$exists": False}}):  # Only classify new claims
+    cleaned_text = preprocess(doc["Claim"])
+    encoding = tokenizer.encode_plus(cleaned_text, return_tensors="pt", max_length=128, truncation=True, padding="max_length")
 
-# Tokenize text
-def tokenize_text(text, tokenizer):
-    encoding = tokenizer.encode_plus(
-        text, max_length=128, truncation=True, padding='max_length', return_tensors='pt'
-    )
-    return encoding["input_ids"], encoding["attention_mask"]
+    with torch.no_grad():
+        prediction = model(encoding["input_ids"], encoding["attention_mask"]).item()
 
-df["probability_fake"] = df["clean_text"].apply(lambda x: model(*tokenize_text(x, tokenizer))[0].item())
-df["probability_real"] = 1 - df["probability_fake"]
-df["predicted_label"] = df["probability_fake"].apply(lambda x: "Fake" if x > 0.5 else "Real")
+    # Store prediction results
+    doc["ProbabilityFake"] = prediction
+    doc["ProbabilityReal"] = 1 - prediction
+    doc["PredictedLabel"] = "Fake" if prediction > 0.5 else "Real"
 
-df.to_csv("data/new_tweets_predictions.csv", index=False)
+    # Update MongoDB with predictions
+    collection.update_one({"_id": doc["_id"]}, {"$set": doc})
+
+print("Classification complete. MongoDB records updated!")
