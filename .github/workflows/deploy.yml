@@ -1,0 +1,32 @@
+name: Deploy Streamlit App
+
+on:
+  push:
+    branches:
+      - main 
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Debug Environment Variables
+        run: env | grep MONGO_URI
+        env:
+          MONGO_URI: ${{ secrets.MONGO_URI }}
+
+      - name: Install Dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install streamlit
+
+      - name: Run Streamlit App
+        run: streamlit run app/streamlit_app.py
+        env:
+          MONGO_URI: ${{ secrets.MONGO_URI }}
