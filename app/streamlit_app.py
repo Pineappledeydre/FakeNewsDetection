@@ -88,25 +88,33 @@ try:
 
         label_counts = df["predicted_label"].value_counts()
 
-        fig, ax = plt.subplots(figsize=(1, 1), dpi=1000)
-        colors = ["#E74C3C", "#2ECC71"]  # Red for Fake, Green for Real
-        num_slices = len(label_counts)  
-        explode = [0.05 if i == 0 else 0 for i in range(num_slices)] 
+
+        fig, ax = plt.subplots(figsize=(1, 1), dpi=200)  # Reduce figure size + increase DPI for clarity
         
-        ax.pie(
+        colors = ["#E74C3C", "#2ECC71"]  # Red for Fake, Green for Real
+        num_slices = len(label_counts)
+        explode = [0.05 if i == 0 else 0 for i in range(num_slices)]  
+        
+        # Create Pie Chart
+        wedges, texts, autotexts = ax.pie(
             label_counts, 
             labels=label_counts.index, 
             autopct='%1.0f%%', 
             colors=colors[:num_slices], 
             startangle=140, 
             explode=explode,  
-            wedgeprops={'linewidth': 0.8, 'edgecolor': 'black'},  
-            textprops={'fontsize': 10}  
+            wedgeprops={'linewidth': 0.5, 'edgecolor': 'black'},  # Even thinner edge lines
+            textprops={'fontsize': 6}  # Reduce font size further
         )
         
-        ax.set_title("Fake vs. Real News", fontsize=12, fontweight="bold") 
+        # Reduce the text size for labels and percentage values
+        for text in texts:
+            text.set_fontsize(5)  # Labels smaller
+        for autotext in autotexts:
+            autotext.set_fontsize(5)  # Percentages smaller
+        
+        ax.set_title("Fake vs. Real News", fontsize=8, fontweight="bold")  # Even smaller title
         st.pyplot(fig)
-
         st.markdown(f"""
             <p style="font-size:16px; font-weight:bold; margin-bottom:2px;">Model Accuracy</p>
             <p style="font-size:14px; margin-top:0px;">{accuracy:.2f}%</p>
