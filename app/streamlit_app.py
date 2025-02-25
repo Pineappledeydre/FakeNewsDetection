@@ -89,31 +89,32 @@ try:
         label_counts = df["predicted_label"].value_counts()
         
         ############################################################################
+        import numpy as np
+        from PIL import Image
         
-        # Fake vs. Real News Data
         labels = ["Fake", "Real"]
-        sizes = [80, 20]  # Example values; replace with actual counts from your data
+        sizes = [80, 20]  # Example: 80% Fake, 20% Real
         colors = ["#E74C3C", "#2ECC71"]  # Red for Fake, Green for Real
-        explode = [0.05, 0]  # Slightly explode the Fake slice for emphasis
-        
-        fig, ax = plt.subplots(figsize=(1,1), dpi=100000)  # High DPI for clarity
+        explode = [0.05, 0] 
+        fig, ax = plt.subplots(figsize=(2, 2), dpi=300)  
         
         wedges, texts, autotexts = ax.pie(
             sizes,
             explode=explode,
             labels=labels,
-            autopct='%1.1f%%',
+            autopct='%1.0f%%',
             colors=colors,
             startangle=140,
             wedgeprops={'linewidth': 0.5, 'edgecolor': 'black'},
-            textprops={'fontsize': 3, 'weight': 'bold'}  
+            textprops={'fontsize': 5, 'weight': 'bold'}  
         )
         
-        ax.set_title("Fake vs. Real News", fontsize=5, fontweight="bold", pad=2)
+        ax.set_title("Fake vs. Real News", fontsize=6, fontweight="bold", pad=2)
         ax.axis("equal") 
-        
-        st.pyplot(fig, bbox_inches="tight")
-                
+        chart_path = "chart.png"
+        fig.savefig(chart_path, bbox_inches="tight", dpi=300)  
+        st.image(chart_path, caption="Fake vs. Real News", use_column_width=False, width=100)  
+            
         ############################################################################
         
         st.markdown(f"""
