@@ -1,10 +1,22 @@
 import requests
 from bs4 import BeautifulSoup
 import time
-from database import collection  # Import MongoDB collection
+import pandas as pd
+from database import collection  # MongoDB collection import
+from preprocess import preprocess  # Import text preprocessing
+
+# ✅ Define label mapping (1 = Fake, 0 = Real)
+label_mapping = {
+    "pants-fire": 1,
+    "false": 1,
+    "barely-true": 1,
+    "half-true": 1,  # Let's consider it Fake
+    "mostly-true": 0,
+    "true": 0
+}
 
 def scrape_politifact_covid(min_claims=50, max_pages=50):
-    """Scrapes Politifact for COVID-related fact-checks and stores them in MongoDB."""
+    """Scrapes Politifact for COVID-related fact-checks, assigns labels, and stores in MongoDB."""
     covid_keywords = ["COVID", "coronavirus", "pandemic", "vaccine", "mask", "quarantine", "lockdown"]
     base_url = "https://www.politifact.com/factchecks/list/?page="
     claims_data = []
@@ -29,9 +41,25 @@ def scrape_politifact_covid(min_claims=50, max_pages=50):
                 source_link = "https://www.politifact.com" + fact.find("a")["href"]
                 date = fact.find("footer", class_="m-statement__footer").text.strip()
 
+                # ✅ Filter only COVID-related claims
                 if any(keyword.lower() in claim_text.lower() for keyword in covid_keywords):
-                    doc = {"Claim": claim_text, "Label": verdict, "Source": source_link, "Date": date}
-                    claims_data.append(doc)
+                    # ✅ Map labels (1 = Fake, 0 = Real)
+                    is_fake = label_mapping.get(verdict.lower(), None)
+
+                    # ✅ Preprocess text
+                    cleaned_text = preprocess(claim_text)
+
+                    # ✅ Only store if label is recognized
+                    if is_fake is not None:
+                        doc = {
+                            "Claim": claim_text,
+                            "Label": verdict,
+                            "is_fake": is_fake,  # Binary label
+                            "clean_text": cleaned_text,
+                            "Source": source_link,
+                            "Date": date
+                        }
+                        claims_data.append(doc)
 
             except AttributeError:
                 continue
@@ -40,9 +68,9 @@ def scrape_politifact_covid(min_claims=50, max_pages=50):
         page += 1
         time.sleep(1)  
 
-    # Insert into MongoDB
+    # ✅ Insert into MongoDB
     if claims_data:
         collection.insert_many(claims_data)
-        print(f"Inserted {len(claims_data)} new claims into MongoDB!")
+        print(f"✅ Inserted {len(claims_data)} new labeled claims into MongoDB!")
 
 scrape_politifact_covid()
