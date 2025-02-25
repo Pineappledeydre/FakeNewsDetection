@@ -99,25 +99,34 @@ try:
 
     if not df.empty:
         # ✅ Ensure 'predicted_label' is correctly derived
-        df["predicted_label"] = df["is_fake"].apply(lambda x: "Fake" if x == 1 else "Real")
+        df["predicted_label"] = df["probability_fake"].apply(lambda x: "Fake" if x > 0.5 else "Real")
+        df["actual_label"] = df["is_fake"].apply(lambda x: "Fake" if x == 1 else "Real")
+
+        # ✅ Calculate Accuracy
+        df["correct"] = df["predicted_label"] == df["actual_label"]
+        accuracy = df["correct"].mean() * 100  # Convert to percentage
 
         # ✅ Count Fake vs. Real for plotting
         label_counts = df["predicted_label"].value_counts()
 
-        # ✅ Matplotlib Bar Chart instead of st.bar_chart
+        # ✅ Matplotlib Pie Chart
         fig, ax = plt.subplots()
-        ax.bar(label_counts.index, label_counts.values, color=["red", "green"])
-        ax.set_ylabel("Count")
+        ax.pie(label_counts, labels=label_counts.index, autopct='%1.1f%%', colors=["red", "green"], startangle=90)
         ax.set_title("Fake vs. Real News Distribution")
         st.pyplot(fig)
 
+        # ✅ Display Model Accuracy
+        st.subheader(f"🎯 Model Accuracy: {accuracy:.2f}%")
+        st.write("Accuracy is calculated as the percentage of correctly classified claims.")
+
         # ✅ Show table with results
         st.subheader("🔍 Full Classification Results")
-        st.dataframe(df[["Claim", "predicted_label", "probability_fake", "probability_real"]])
+        st.dataframe(df[["Claim", "predicted_label", "actual_label", "probability_fake", "probability_real"]])
     else:
         st.info("No classified claims found.")
 except Exception as e:
     st.error(f"❌ Error fetching classified claims: {e}")
+
 
 
 # ==============================================
