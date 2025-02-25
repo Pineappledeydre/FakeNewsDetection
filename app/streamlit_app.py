@@ -74,7 +74,7 @@ except Exception as e:
     st.error(f"‼️ Error Fetching Claims: {e}")
 
 # Fake vs. Real News Distribution
-st.markdown("<h4 style='font-size:12px; font-weight:bold;'>🦕 Fake vs. Real News Distribution 🦖</h4>", unsafe_allow_html=True)
+st.markdown("<h4 style='font-size:16px; font-weight:bold;'>🦕 Fake vs. Real News Distribution 🦖</h4>", unsafe_allow_html=True)
 
 try:
     df = pd.DataFrame(list(collection.find({}, {"Claim": 1, "probability_fake": 1, "probability_real": 1, "is_fake": 1})))
@@ -95,7 +95,7 @@ try:
 
         st.metric(label="Model Accuracy", value=f"{accuracy:.2f}%", help="Percentage of correctly classified claims.")
 
-        st.markdown("<h4 style='font-size:12px; font-weight:bold;'>🔍 Full Classification Results</h4>", unsafe_allow_html=True)
+        st.markdown("<h4 style='font-size:16px; font-weight:bold;'>🔍 Full Classification Results</h4>", unsafe_allow_html=True)
         st.dataframe(df[["Claim", "predicted_label", "actual_label", "probability_fake", "probability_real"]])
     else:
         st.info("No classified claims found.")
@@ -103,7 +103,7 @@ except Exception as e:
     st.error(f"‼️ Error Fetching Classified Claims: {e}")
 
 # Your Own Claim
-st.markdown("<h4 style='font-size:12px; font-weight:bold;'>📝 Classify Your Own Claim</h4>", unsafe_allow_html=True)
+st.markdown("<h4 style='font-size:16px; font-weight:bold;'>📝 Classify Your Own Claim</h4>", unsafe_allow_html=True)
 user_input = st.text_area("Enter a claim:")
 
 if st.button("🔎 Analyze Claim"):
