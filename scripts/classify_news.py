@@ -3,6 +3,7 @@ import torch.nn as nn
 from transformers import BertTokenizer, BertModel
 import os
 import sys
+import pandas as pd
 
 # ✅ Add `scripts` directory to Python path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../scripts')))
