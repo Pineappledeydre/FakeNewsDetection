@@ -5,16 +5,14 @@ from transformers import BertTokenizer, BertModel
 from torch.utils.data import Dataset, DataLoader
 from database import collection
 
-# ✅ Fetch labeled data from MongoDB
-claims = list(collection.find({}, {"clean_text": 1, "is_fake": 1}))  # Only fetch necessary fields
+claims = list(collection.find({}, {"clean_text": 1, "is_fake": 1}))  
 
 if not claims:
-    print("⚠️ No labeled data found in MongoDB! Exiting...")
+    print("❔ No labeled data found in MongoDB! Exiting...")
     exit()
 
 df_train = pd.DataFrame(claims)
 
-# ✅ Dataset Class
 class LabeledTextDataset(Dataset):
     def __init__(self, texts, labels, tokenizer, max_length=128):
         self.texts = texts
@@ -37,7 +35,6 @@ class LabeledTextDataset(Dataset):
             "label": torch.tensor(label, dtype=torch.float),
         }
 
-# ✅ Define Model
 class BertClassifier(nn.Module):
     def __init__(self, dropout=0.3):
         super(BertClassifier, self).__init__()
@@ -52,7 +49,6 @@ class BertClassifier(nn.Module):
         dropout_output = self.dropout(pooled_output)
         return self.sigmoid(self.fc(dropout_output))
 
-# ✅ Initialize Model & Tokenizer
 model = BertClassifier()
 tokenizer = BertTokenizer.from_pretrained("bert-base-uncased")
 
@@ -62,16 +58,15 @@ initial_model_path = "models/best_model.pth"
 # Load existing fine-tuned model if available, otherwise load best_model.pth
 try:
     model.load_state_dict(torch.load(fine_tuned_model_path, map_location=torch.device("cpu")))
-    print(f"✅ Loaded fine-tuned model from {fine_tuned_model_path}")
+    print(f"🦖 Loaded fine-tuned model from {fine_tuned_model_path}")
 except FileNotFoundError:
     try:
         model.load_state_dict(torch.load(initial_model_path, map_location=torch.device("cpu")))
-        print(f"✅ No fine-tuned model found. Loaded initial model from {initial_model_path}")
+        print(f"🦖 No fine-tuned model found. Loaded initial model from {initial_model_path}")
     except FileNotFoundError:
-        print("❌ No model found! Make sure to add `best_model.pth` to the `models/` folder.")
+        print("‼️ No model found! Make sure to add `best_model.pth` to the `models/` folder.")
         exit()
 
-# ✅ Split data into Train & Validation
 train_size = int(0.85 * len(df_train))  # 85% for training, 15% for validation
 train_df = df_train[:train_size]
 val_df = df_train[train_size:]
@@ -82,11 +77,11 @@ val_dataset = LabeledTextDataset(val_df["clean_text"].tolist(), val_df["is_fake"
 train_dataloader = DataLoader(train_dataset, batch_size=16, shuffle=True)
 val_dataloader = DataLoader(val_dataset, batch_size=16, shuffle=False)
 
-# ✅ Define Loss & Optimizer
+# Loss & Optimizer
 criterion = torch.nn.BCEWithLogitsLoss()
 optimizer = torch.optim.AdamW(model.parameters(), lr=2e-5)
 
-# ✅ Fine-tune Model
+# Fine-tune Model
 epochs = 3
 best_loss = float("inf")
 
@@ -111,7 +106,6 @@ for epoch in range(epochs):
 
     avg_train_loss = total_loss / len(train_dataloader)
     
-    # ✅ Validation Step
     model.eval()
     val_loss = 0
     with torch.no_grad():
@@ -128,10 +122,10 @@ for epoch in range(epochs):
 
     print(f"Epoch {epoch+1}/{epochs} | Train Loss: {avg_train_loss:.4f} | Val Loss: {avg_val_loss:.4f}")
 
-    # ✅ Save Best Model
+    # Save Best Model
     if avg_val_loss < best_loss:
         best_loss = avg_val_loss
         torch.save(model.state_dict(), model_path)
-        print("✅ Fine-tuning complete. Best model saved!")
+        print("🦖 Fine-tuning complete. Best model saved!")
 
-print("🔥 Fine-tuning finished! 🚀")
+print("🔥 Fine-tuning finished! 🔥")
