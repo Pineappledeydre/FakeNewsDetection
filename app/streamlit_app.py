@@ -48,14 +48,19 @@ except Exception as e:
 st.title("📰 Fake News Detector - Politifact")
 
 # =====================================================
-# 🔹 **Fetch New Claims from Politifact**
+# 🔹 **Fetch New Claims from Politifact (User Control)**
 # =====================================================
-if st.button("🔄 Fetch New Fact-Checked Claims"):
-    st.info("⏳ Scraping new claims from Politifact...")
+st.header("🔄 Fetch New Fact-Checked Claims")
+
+min_claims = st.slider("Select number of claims to fetch:", min_value=10, max_value=100, value=50, step=10)
+max_pages = st.slider("Select maximum pages to search:", min_value=1, max_value=50, value=10, step=1)
+
+if st.button("🔄 Fetch New Claims"):
+    st.info(f"⏳ Scraping {min_claims} claims from up to {max_pages} pages...")
     
     try:
-        fetch_new_politifact_claims()  # Run the scraper
-        st.success("✅ New claims fetched and stored in MongoDB! Click 'Refresh' to update the list.")
+        fetch_new_politifact_claims(min_claims=min_claims, max_pages=max_pages)  # Run scraper with user settings
+        st.success(f"✅ Scraped up to {min_claims} claims from {max_pages} pages! Refresh the list to see updates.")
     except Exception as e:
         st.error(f"❌ Error fetching claims: {e}")
         
