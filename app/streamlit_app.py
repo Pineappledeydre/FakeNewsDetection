@@ -2,14 +2,15 @@ import streamlit as st
 import pymongo
 import torch
 from dotenv import load_dotenv
-from classify_news import model, tokenizer  # Load model from classify_news.py
-from preprocess import preprocess  # Load text preprocessing
 
 import sys
 import os
 
 # the scripts directory --> sys.path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../scripts')))
+
+from classify_news import model, tokenizer  # Load model from classify_news.py
+from preprocess import preprocess  # Load text preprocessing
 
 # Load MongoDB credentials
 load_dotenv()
