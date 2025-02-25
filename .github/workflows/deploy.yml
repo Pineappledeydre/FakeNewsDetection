@@ -15,11 +15,14 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Set MONGO_URI in Environment
-        run: echo "MONGO_URI=${{ secrets.MONGO_URI }}" >> $GITHUB_ENV
+      - name: Set up Streamlit secrets
+        run: |
+          mkdir -p ~/.streamlit
+          echo "[general]" > ~/.streamlit/secrets.toml
+          echo "MONGO_URI = \"${{ secrets.MONGO_URI }}\"" >> ~/.streamlit/secrets.toml
 
-      - name: Debug Environment Variables
-        run: env | grep MONGO_URI
+      - name: Debug Secrets File
+        run: cat ~/.streamlit/secrets.toml
 
       - name: Install Dependencies
         run: |
@@ -29,5 +32,3 @@ jobs:
 
       - name: Run Streamlit App
         run: streamlit run app/streamlit_app.py --server.port 8501 --server.headless true
-        env:
-          MONGO_URI: ${{ secrets.MONGO_URI }}
