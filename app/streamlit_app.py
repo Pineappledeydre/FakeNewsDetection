@@ -37,7 +37,7 @@ except Exception as e:
     st.error(f"‼️ Failed to connect to MongoDB: {e}")
     st.stop()
 
-st.markdown("<h4 style='font-size:20px; font-weight:bold;'>📰 Fake News Detector - Covid 19</h4>", unsafe_allow_html=True)
+st.markdown("<h4 style='font-size:22px; font-weight:bold;'>📰 Fake News Detector - Covid 19</h4>", unsafe_allow_html=True)
 
 # Fetch New Claims from Politifact
 st.markdown("<h4 style='font-size:16px; font-weight:bold;'>🔄 Fetch New Fact-Checked Claims</h4>", unsafe_allow_html=True)
@@ -93,7 +93,10 @@ try:
         ax.set_title("Fake vs. Real News Distribution")
         st.pyplot(fig)
 
-        st.metric(label="Model Accuracy", value=f"{accuracy:.2f}%", help="Percentage of correctly classified claims.")
+        st.markdown(f"""
+            <p style="font-size:14px; font-weight:bold; margin-bottom:2px;">Model Accuracy</p>
+            <p style="font-size:12px; margin-top:0px;">{accuracy:.2f}%</p>
+        """, unsafe_allow_html=True)
 
         st.markdown("<h4 style='font-size:16px; font-weight:bold;'>🔍 Full Classification Results</h4>", unsafe_allow_html=True)
         st.dataframe(df[["Claim", "predicted_label", "actual_label", "probability_fake", "probability_real"]])
