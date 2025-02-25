@@ -88,7 +88,7 @@ try:
 
         label_counts = df["predicted_label"].value_counts()
 
-        fig, ax = plt.subplots(figsize=(1, 1), dpi=100)
+        fig, ax = plt.subplots(figsize=(1, 1), dpi=1000)
         colors = ["#E74C3C", "#2ECC71"]  # Red for Fake, Green for Real
         num_slices = len(label_counts)  
         explode = [0.05 if i == 0 else 0 for i in range(num_slices)] 
