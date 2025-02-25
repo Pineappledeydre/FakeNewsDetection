@@ -12,6 +12,10 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../scri
 # Load MongoDB credentials
 load_dotenv()
 
+env_vars = os.environ
+st.write("🔍 **All Environment Variables:**")
+st.write(env_vars)
+
 # ✅ Manually force MONGO_URI if missing
 MONGO_URI = os.getenv("MONGO_URI")
 st.write(f"MONGO_URI from ENV: {MONGO_URI}")
