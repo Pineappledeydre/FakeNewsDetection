@@ -89,21 +89,27 @@ except Exception as e:
 # ==============================================
 # 📊 **Visualization of Fake vs. Real News**
 # ==============================================
+import matplotlib.pyplot as plt
+
 st.header("📊 Fake vs. Real News Distribution")
 
 # ✅ Fetch latest predictions from MongoDB
 try:
-    df = pd.DataFrame(list(collection.find({}, {"Claim": 1, "probability_fake": 1, "probability_real": 1, "predicted_label": 1})))
+    df = pd.DataFrame(list(collection.find({}, {"Claim": 1, "probability_fake": 1, "probability_real": 1, "is_fake": 1})))
 
     if not df.empty:
-        # ✅ Convert labels for visualization
-        df["predicted_label"] = df["predicted_label"].map({1: "Fake", 0: "Real"})
-        
-        # ✅ Count Fake vs. Real
+        # ✅ Ensure 'predicted_label' is correctly derived
+        df["predicted_label"] = df["is_fake"].apply(lambda x: "Fake" if x == 1 else "Real")
+
+        # ✅ Count Fake vs. Real for plotting
         label_counts = df["predicted_label"].value_counts()
 
-        # ✅ Display as Bar Chart
-        st.bar_chart(label_counts)
+        # ✅ Matplotlib Bar Chart instead of st.bar_chart
+        fig, ax = plt.subplots()
+        ax.bar(label_counts.index, label_counts.values, color=["red", "green"])
+        ax.set_ylabel("Count")
+        ax.set_title("Fake vs. Real News Distribution")
+        st.pyplot(fig)
 
         # ✅ Show table with results
         st.subheader("🔍 Full Classification Results")
@@ -112,6 +118,7 @@ try:
         st.info("No classified claims found.")
 except Exception as e:
     st.error(f"❌ Error fetching classified claims: {e}")
+
 
 # ==============================================
 # 📝 **Classify User's Input**
