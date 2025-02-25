@@ -86,6 +86,30 @@ def scrape_politifact_covid(min_claims=50, max_pages=50):
         collection.insert_many(new_claims)
         print(f"✅ Inserted {len(new_claims)} new labeled claims into MongoDB!")
 
-def fetch_new_politifact_claims(min_claims=50, max_pages=50):
-    """Fetch and store new Politifact claims in MongoDB based on user input."""
+from classify_news import predict_fake
+
+def fetch_new_politifact_claims(min_claims=10, max_pages=12):
+    """Fetch and store new Politifact claims in MongoDB."""
     scrape_politifact_covid(min_claims=min_claims, max_pages=max_pages)
+
+    # ✅ Fetch new claims that are missing classification
+    unclassified_claims = list(collection.find({"probability_fake": {"$exists": False}}))
+
+    if unclassified_claims:
+        for claim in unclassified_claims:
+            claim_text = claim["clean_text"]
+            probability_fake = predict_fake(claim_text)
+            probability_real = 1 - probability_fake
+            predicted_label = "Fake" if probability_fake > 0.5 else "Real"
+
+            # ✅ Update MongoDB with classification results
+            collection.update_one(
+                {"_id": claim["_id"]},
+                {"$set": {
+                    "probability_fake": probability_fake,
+                    "probability_real": probability_real,
+                    "predicted_label": predicted_label
+                }}
+            )
+
+        print(f"✅ Classified {len(unclassified_claims)} newly fetched claims!")
