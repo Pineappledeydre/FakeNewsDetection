@@ -82,14 +82,18 @@ if "clean_text" not in df.columns:
 # ✅ Run BERT Classification
 def predict_fake(text):
     """Predicts the probability of fake news using BERT"""
-    input_ids, attention_mask = tokenizer.encode_plus(
+    encoding = tokenizer.encode_plus(
         text, max_length=128, truncation=True, padding='max_length', return_tensors='pt'
-    ).values()
-    
+    )
+
+    input_ids = encoding["input_ids"]
+    attention_mask = encoding["attention_mask"]
+
     with torch.no_grad():
         output = model(input_ids, attention_mask)
-    
+
     return output.squeeze().item()
+
 
 df["probability_fake"] = df["clean_text"].apply(predict_fake)
 df["probability_real"] = 1 - df["probability_fake"]
