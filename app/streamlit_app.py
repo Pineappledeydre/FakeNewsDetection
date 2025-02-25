@@ -13,10 +13,11 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../scri
 load_dotenv()
 
 # ✅ Manually force MONGO_URI if missing
-MONGO_URI = os.getenv("MONGO_URI", "missing")
+MONGO_URI = os.getenv("MONGO_URI")
+st.write(f"MONGO_URI from ENV: {mongo_uri}")
 
-if MONGO_URI == "missing":
-    st.error("❌ MONGO_URI is missing! Check your GitHub Actions Secrets.")
+if not mongo_uri:
+    st.error("❌ MONGO_URI is missing in Streamlit! Check your GitHub Secrets.")
     st.stop()
 
 # ✅ Import database after ensuring MONGO_URI is loaded
