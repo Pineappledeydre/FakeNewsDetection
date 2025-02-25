@@ -10,7 +10,7 @@ urllib3==2.3.0
 
 # PyTorch & Transformers (for BERT)
 torch==2.2.0
-torchvision==0.16.0
+torchvision>=0.17.0
 transformers==4.40.0
 sentencepiece==0.1.99  # Latest stable for Transformers
 
