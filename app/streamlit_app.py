@@ -47,6 +47,18 @@ except Exception as e:
 # ✅ App Title
 st.title("📰 Fake News Detector - Politifact")
 
+# =====================================================
+# 🔹 **Fetch New Claims from Politifact**
+# =====================================================
+if st.button("🔄 Fetch New Fact-Checked Claims"):
+    st.info("⏳ Scraping new claims from Politifact...")
+    
+    try:
+        fetch_new_politifact_claims()  # Run the scraper
+        st.success("✅ New claims fetched and stored in MongoDB! Click 'Refresh' to update the list.")
+    except Exception as e:
+        st.error(f"❌ Error fetching claims: {e}")
+        
 # ==============================================
 # 🔹 **Display Latest Fact-Checked Claims**
 # ==============================================
