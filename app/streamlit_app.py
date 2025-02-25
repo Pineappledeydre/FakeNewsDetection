@@ -96,7 +96,6 @@ try:
         colors = ["#E74C3C", "#2ECC71"]  # Red for Fake, Green for Real
         explode = [0.05, 0]  # Slightly explode the Fake slice for emphasis
         
-        # Create a Small & Sharp Pie Chart
         fig, ax = plt.subplots(figsize=(1,1), dpi=600)  # High DPI for clarity
         
         wedges, texts, autotexts = ax.pie(
@@ -107,14 +106,12 @@ try:
             colors=colors,
             startangle=140,
             wedgeprops={'linewidth': 0.5, 'edgecolor': 'black'},
-            textprops={'fontsize': 6, 'weight': 'bold'}  # Small but readable
+            textprops={'fontsize': 4, 'weight': 'bold'}  
         )
         
-        # Make sure the chart looks **sharp** and **proportional**
-        ax.set_title("Fake vs. Real News", fontsize=7, fontweight="bold", pad=2)
-        ax.axis("equal")  # Ensures the pie chart is a **circle**, not an ellipse
+        ax.set_title("Fake vs. Real News", fontsize=5, fontweight="bold", pad=2)
+        ax.axis("equal") 
         
-        # Render the Pie Chart in Streamlit
         st.pyplot(fig, bbox_inches="tight")
                 
         ############################################################################
