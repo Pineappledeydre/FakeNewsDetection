@@ -88,7 +88,7 @@ try:
 
         label_counts = df["predicted_label"].value_counts()
         
-        fig, ax = plt.subplots(figsize=(0.5, 0.5), dpi=500)  # Tiny size + higher DPI for clarity
+        fig, ax = plt.subplots(figsize=(0.3, 0.3))  # Tiny size + higher DPI for clarity
         
         colors = ["#E74C3C", "#2ECC71"]  # Red for Fake, Green for Real
         num_slices = len(label_counts)
