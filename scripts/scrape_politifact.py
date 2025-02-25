@@ -86,6 +86,6 @@ def scrape_politifact_covid(min_claims=50, max_pages=50):
         collection.insert_many(new_claims)
         print(f"✅ Inserted {len(new_claims)} new labeled claims into MongoDB!")
 
-def fetch_new_politifact_claims():
-    """Fetch and store new Politifact claims in MongoDB."""
-    scrape_politifact_covid()
+def fetch_new_politifact_claims(min_claims=50, max_pages=50):
+    """Fetch and store new Politifact claims in MongoDB based on user input."""
+    scrape_politifact_covid(min_claims=min_claims, max_pages=max_pages)
