@@ -90,13 +90,14 @@ try:
         
         ############################################################################
         
+        # Fake vs. Real News Data
         labels = ["Fake", "Real"]
         sizes = [80, 20]  # Example values; replace with actual counts from your data
         colors = ["#E74C3C", "#2ECC71"]  # Red for Fake, Green for Real
         explode = [0.05, 0]  # Slightly explode the Fake slice for emphasis
         
-        # Create a Tiny & Sharp Pie Chart
-        fig, ax = plt.subplots(figsize=(1, 1), dpi=400)  # Smaller with High DPI for Clarity
+        # Create a Small & Sharp Pie Chart
+        fig, ax = plt.subplots(figsize=(2, 2), dpi=600)  # High DPI for clarity
         
         wedges, texts, autotexts = ax.pie(
             sizes,
@@ -105,19 +106,17 @@ try:
             autopct='%1.1f%%',
             colors=colors,
             startangle=140,
-            wedgeprops={'linewidth': 0.3, 'edgecolor': 'black'},
-            textprops={'fontsize': 3, 'weight': 'light'}
+            wedgeprops={'linewidth': 0.5, 'edgecolor': 'black'},
+            textprops={'fontsize': 6, 'weight': 'bold'}  # Small but readable
         )
         
-        # Reduce text size inside & outside pie
-        for text in texts:
-            text.set_fontsize(3)  # Smallest labels
-        for autotext in autotexts:
-            autotext.set_fontsize(3)  # Smallest percentages
+        # Make sure the chart looks **sharp** and **proportional**
+        ax.set_title("Fake vs. Real News", fontsize=7, fontweight="bold", pad=2)
+        ax.axis("equal")  # Ensures the pie chart is a **circle**, not an ellipse
         
-        ax.set_title("Fake vs. Real News", fontsize=5, fontweight="bold", pad=1)
-        st.pyplot(fig)
-        
+        # Render the Pie Chart in Streamlit
+        st.pyplot(fig, bbox_inches="tight")
+                
         ############################################################################
         
         st.markdown(f"""
