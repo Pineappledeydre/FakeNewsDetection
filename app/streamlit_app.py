@@ -96,7 +96,7 @@ try:
         colors = ["#E74C3C", "#2ECC71"]  # Red for Fake, Green for Real
         explode = [0.05, 0]  # Slightly explode the Fake slice for emphasis
         
-        fig, ax = plt.subplots(figsize=(1,1), dpi=3000)  # High DPI for clarity
+        fig, ax = plt.subplots(figsize=(0.6,0.6), dpi=3000)  # High DPI for clarity
         
         wedges, texts, autotexts = ax.pie(
             sizes,
