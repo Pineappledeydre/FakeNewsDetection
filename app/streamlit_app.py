@@ -96,7 +96,7 @@ try:
         sizes = [80, 20]  # Example: 80% Fake, 20% Real
         colors = ["#E74C3C", "#2ECC71"]  # Red for Fake, Green for Real
         explode = [0.05, 0] 
-        fig, ax = plt.subplots(figsize=(4,4), dpi=500)  
+        fig, ax = plt.subplots(figsize=(0.3,0.3), dpi=500)  
         
         wedges, texts, autotexts = ax.pie(
             sizes,
