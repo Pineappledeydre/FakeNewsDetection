@@ -57,12 +57,11 @@ st.header("🔄 Fetch New Fact-Checked Claims")
 min_claims = st.slider("Select number of claims to fetch:", min_value=10, max_value=100, value=50, step=10)
 max_pages = st.slider("Select maximum pages to search:", min_value=1, max_value=50, value=10, step=1)
 
-if st.button("🔄 Fetch New Claims"):
-    st.info(f"⏳ Scraping {min_claims} claims from up to {max_pages} pages...")
-    
+if st.button("🔍 Fetch New Claims"):
     try:
-        fetch_new_politifact_claims(min_claims=min_claims, max_pages=max_pages)  # Run scraper with user settings
-        st.success(f"✅ Scraped up to {min_claims} claims from {max_pages} pages! Refresh the list to see updates.")
+        fetch_new_politifact_claims(min_claims=min_claims, max_pages=max_pages)  # ✅ Fetch & classify
+        st.success(f"✅ Scraped and classified {min_claims} claims from up to {max_pages} pages!")
+        st.experimental_rerun()  # ✅ Refresh Streamlit to show results!
     except Exception as e:
         st.error(f"❌ Error fetching claims: {e}")
         
