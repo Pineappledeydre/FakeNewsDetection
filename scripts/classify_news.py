@@ -1,11 +1,10 @@
 import torch
 import torch.nn as nn
-import pandas as pd
 from transformers import BertTokenizer, BertModel
-import sys
 import os
+import sys
 
-# ✅ Add the scripts directory to Python's module search path
+# ✅ Add `scripts` directory to Python path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../scripts')))
 
 from database import collection  
@@ -26,23 +25,29 @@ class BertClassifier(nn.Module):
         dropout_output = self.dropout(pooled_output)
         return self.sigmoid(self.fc(dropout_output))
 
-# ✅ Move model loading into a function to avoid import loops
+# ✅ Load Model & Tokenizer
+model = None
+tokenizer = BertTokenizer.from_pretrained("bert-base-uncased")  # Load tokenizer even if model is missing
+
 def load_model():
-    global model, tokenizer
+    global model
     model = BertClassifier()
     model_path = "models/bert_finetuned_model.pth"
+
+    if not os.path.exists(model_path):
+        print(f"⚠️ Model not found at {model_path}! Using default weights.")
+        return  # Don't exit, just use an untrained model
 
     try:
         model.load_state_dict(torch.load(model_path, map_location=torch.device("cpu")))
         print(f"✅ Loaded model from {model_path}")
-    except FileNotFoundError:
-        print("⚠️ No fine-tuned model found. Exiting...")
-        exit()
+    except Exception as e:
+        print(f"⚠️ Failed to load model: {e}")
+        model = None  # Keep model as None if loading fails
 
     model.eval()
-    tokenizer = BertTokenizer.from_pretrained("bert-base-uncased")
 
-# ✅ Call the function to load model and tokenizer
+# ✅ Call model loading function
 load_model()
 
 
