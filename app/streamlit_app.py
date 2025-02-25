@@ -14,9 +14,9 @@ load_dotenv()
 
 # ✅ Manually force MONGO_URI if missing
 MONGO_URI = os.getenv("MONGO_URI")
-st.write(f"MONGO_URI from ENV: {mongo_uri}")
+st.write(f"MONGO_URI from ENV: {MONGO_URI}")
 
-if not mongo_uri:
+if not MONGO_URI:
     st.error("❌ MONGO_URI is missing in Streamlit! Check your GitHub Secrets.")
     st.stop()
 
