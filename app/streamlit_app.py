@@ -88,34 +88,37 @@ try:
 
         label_counts = df["predicted_label"].value_counts()
         
-        fig, ax = plt.subplots(figsize=(0.3, 0.3))  # Tiny size + higher DPI for clarity
+        ############################################################################
         
+        labels = ["Fake", "Real"]
+        sizes = [80, 20]  # Example values; replace with actual counts from your data
         colors = ["#E74C3C", "#2ECC71"]  # Red for Fake, Green for Real
-        num_slices = len(label_counts)
-        explode = [0.05 if i == 0 else 0 for i in range(num_slices)]  
+        explode = [0.05, 0]  # Slightly explode the Fake slice for emphasis
         
-        # Create Pie Chart
+        # Create a Tiny & Sharp Pie Chart
+        fig, ax = plt.subplots(figsize=(1, 1), dpi=400)  # Smaller with High DPI for Clarity
+        
         wedges, texts, autotexts = ax.pie(
-            label_counts, 
-            labels=label_counts.index, 
-            autopct='%1.0f%%', 
-            colors=colors[:num_slices], 
-            startangle=140, 
-            explode=explode,  
-            wedgeprops={'linewidth': 0.3, 'edgecolor': 'black'},  # Very thin edges
-            textprops={'fontsize': 4, 'weight': 'light'}  # Even smaller text
+            sizes,
+            explode=explode,
+            labels=labels,
+            autopct='%1.1f%%',
+            colors=colors,
+            startangle=140,
+            wedgeprops={'linewidth': 0.3, 'edgecolor': 'black'},
+            textprops={'fontsize': 3, 'weight': 'light'}
         )
         
-        # Reduce font size for labels & percentages
+        # Reduce text size inside & outside pie
         for text in texts:
-            text.set_fontsize(3)  # Labels smallest
+            text.set_fontsize(3)  # Smallest labels
         for autotext in autotexts:
-            autotext.set_fontsize(3)  # Percentages smallest
+            autotext.set_fontsize(3)  # Smallest percentages
         
-        ax.set_title("Fake vs. Real News", fontsize=6, fontweight="bold", pad=2)  # Shrink title & reduce padding
+        ax.set_title("Fake vs. Real News", fontsize=5, fontweight="bold", pad=1)
         st.pyplot(fig)
-
-
+        
+        ############################################################################
         
         st.markdown(f"""
             <p style="font-size:16px; font-weight:bold; margin-bottom:2px;">Model Accuracy</p>
