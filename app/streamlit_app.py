@@ -17,25 +17,18 @@ st.write("🔍 **All Environment Variables:**")
 st.write(env_vars)
 
 # ✅ Manually force MONGO_URI if missing
-MONGO_URI = os.getenv("MONGO_URI")
-st.write(f"MONGO_URI from ENV: {MONGO_URI}")
+MONGO_URI = st.secrets["MONGO_URI"]
 
 if not MONGO_URI:
-    st.error("❌ MONGO_URI is missing in Streamlit! Check your GitHub Secrets.")
+    st.error("❌ MONGO_URI is missing! Check `.streamlit/secrets.toml` or GitHub Secrets.")
     st.stop()
-
+    
 # ✅ Import database after ensuring MONGO_URI is loaded
 from database import collection
 from preprocess import preprocess
 from classify_news import model, tokenizer
 
-MONGO_URI = os.getenv("MONGO_URI")
-
-if not MONGO_URI:
-    st.error("❌ MongoDB connection string is missing! Check your .env file or GitHub Secrets.")
-    st.stop()
-
-# Connect to MongoDB
+# ✅ Connect to MongoDB
 try:
     client = pymongo.MongoClient(MONGO_URI)
     db = client["FakeNewsDB"]
