@@ -88,22 +88,23 @@ try:
 
         label_counts = df["predicted_label"].value_counts()
 
-        fig, ax = plt.subplots(figsize=(3, 3))  # Reduce figure size for compact view
-        
+        fig, ax = plt.subplots(figsize=(3, 3))  
         colors = ["#E74C3C", "#2ECC71"]  # Red for Fake, Green for Real
-        explode = (0.05, 0) 
+        num_slices = len(label_counts)  
+        explode = [0.05 if i == 0 else 0 for i in range(num_slices)] 
+        
         ax.pie(
             label_counts, 
             labels=label_counts.index, 
             autopct='%1.0f%%', 
-            colors=colors, 
+            colors=colors[:num_slices], 
             startangle=140, 
-            explode=explode, 
-            wedgeprops={'linewidth': 0.8, 'edgecolor': 'black'}, 
+            explode=explode,  
+            wedgeprops={'linewidth': 0.8, 'edgecolor': 'black'},  
             textprops={'fontsize': 10}  
         )
         
-        ax.set_title("Fake vs. Real News", fontsize=16, fontweight="bold")  
+        ax.set_title("Fake vs. Real News", fontsize=12, fontweight="bold") 
         st.pyplot(fig)
 
         st.markdown(f"""
