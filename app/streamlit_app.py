@@ -106,10 +106,10 @@ try:
             colors=colors,
             startangle=140,
             wedgeprops={'linewidth': 0.5, 'edgecolor': 'black'},
-            textprops={'fontsize': 2, 'weight': 'bold'}  
+            textprops={'fontsize': 10, 'weight': 'bold'}  
         )
         
-        ax.set_title("Fake vs. Real News", fontsize=5, fontweight="bold", pad=2)
+        ax.set_title("Fake vs. Real News", fontsize=14, fontweight="bold", pad=2)
         ax.axis("equal") 
         
         st.pyplot(fig, bbox_inches="tight")
