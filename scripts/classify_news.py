@@ -2,16 +2,14 @@ import torch
 import torch.nn as nn
 import pandas as pd
 from transformers import BertTokenizer, BertModel
-from database import collection  
-from preprocess import preprocess  
-
 import sys
 import os
 
-# Add the scripts directory to Python's module search path
+# ✅ Add the scripts directory to Python's module search path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../scripts')))
 
-from classify_news import model, tokenizer
+from database import collection  
+from preprocess import preprocess  
 
 # ✅ Define BERT Classifier
 class BertClassifier(nn.Module):
@@ -28,19 +26,25 @@ class BertClassifier(nn.Module):
         dropout_output = self.dropout(pooled_output)
         return self.sigmoid(self.fc(dropout_output))
 
-# ✅ Load trained model
-model = BertClassifier()
-model_path = "models/bert_finetuned_model.pth"  # Ensure the path is correct
+# ✅ Move model loading into a function to avoid import loops
+def load_model():
+    global model, tokenizer
+    model = BertClassifier()
+    model_path = "models/bert_finetuned_model.pth"
 
-try:
-    model.load_state_dict(torch.load(model_path, map_location=torch.device("cpu")))
-    print(f"✅ Loaded model from {model_path}")
-except FileNotFoundError:
-    print("⚠️ No fine-tuned model found. Exiting...")
-    exit()
+    try:
+        model.load_state_dict(torch.load(model_path, map_location=torch.device("cpu")))
+        print(f"✅ Loaded model from {model_path}")
+    except FileNotFoundError:
+        print("⚠️ No fine-tuned model found. Exiting...")
+        exit()
 
-model.eval()
-tokenizer = BertTokenizer.from_pretrained("bert-base-uncased")
+    model.eval()
+    tokenizer = BertTokenizer.from_pretrained("bert-base-uncased")
+
+# ✅ Call the function to load model and tokenizer
+load_model()
+
 
 def tokenize_text(text):
     """Tokenizes text for BERT"""
