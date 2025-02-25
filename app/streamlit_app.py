@@ -25,6 +25,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../scri
 from database import collection
 from preprocess import preprocess
 import classify_news
+from scrape_politifact import fetch_new_politifact_claims  
 
 # ✅ Check if model was loaded successfully
 if classify_news.model is None:
