@@ -146,7 +146,7 @@ if st.button("🔎 Analyze Claim"):
             # ✅ Save to MongoDB
             collection.insert_one({
                 "Claim": user_input,
-                "Label": "Not classified",  # Default, will update later
+                "Label": "Not classified",  # Default label from Politifact, will be updated later
                 "is_fake": 1 if predicted_label == "Fake" else 0,
                 "clean_text": cleaned_text,
                 "Source": "User Submitted",
@@ -155,6 +155,7 @@ if st.button("🔎 Analyze Claim"):
                 "probability_real": probability_real,
                 "predicted_label": predicted_label,  # ✅ Now stored!
             })
+
             st.success("✅ Claim added to MongoDB for tracking!")
 
         except Exception as e:
