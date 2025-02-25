@@ -56,13 +56,20 @@ class BertClassifier(nn.Module):
 model = BertClassifier()
 tokenizer = BertTokenizer.from_pretrained("bert-base-uncased")
 
-# ✅ Load existing fine-tuned model (if available)
-model_path = "models/bert_finetuned_model.pth"
+fine_tuned_model_path = "models/bert_finetuned_model.pth"
+initial_model_path = "models/best_model.pth"
+
+# Load existing fine-tuned model if available, otherwise load best_model.pth
 try:
-    model.load_state_dict(torch.load(model_path, map_location=torch.device("cpu")))
-    print(f"✅ Loaded fine-tuned model from {model_path}")
+    model.load_state_dict(torch.load(fine_tuned_model_path, map_location=torch.device("cpu")))
+    print(f"✅ Loaded fine-tuned model from {fine_tuned_model_path}")
 except FileNotFoundError:
-    print("⚠️ No fine-tuned model found. Training from scratch.")
+    try:
+        model.load_state_dict(torch.load(initial_model_path, map_location=torch.device("cpu")))
+        print(f"✅ No fine-tuned model found. Loaded initial model from {initial_model_path}")
+    except FileNotFoundError:
+        print("❌ No model found! Make sure to add `best_model.pth` to the `models/` folder.")
+        exit()
 
 # ✅ Split data into Train & Validation
 train_size = int(0.85 * len(df_train))  # 85% for training, 15% for validation
