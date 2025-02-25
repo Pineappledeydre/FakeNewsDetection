@@ -5,19 +5,20 @@ import pandas as pd
 import datetime
 from database import collection  # MongoDB collection import
 from preprocess import preprocess  # Import text preprocessing
+from classify_news import predict_fake  # Import classification function
 
 # ✅ Define label mapping (1 = Fake, 0 = Real)
 label_mapping = {
     "pants-fire": 1,
     "false": 1,
     "barely-true": 1,
-    "half-true": 1,  # Let's consider it Fake
+    "half-true": 1,  # Considered Fake
     "mostly-true": 0,
     "true": 0
 }
 
 def scrape_politifact_covid(min_claims=50, max_pages=50):
-    """Scrapes Politifact for COVID-related fact-checks, assigns labels, and stores in MongoDB."""
+    """Scrapes Politifact for COVID-related fact-checks, assigns labels, classifies, and stores in MongoDB."""
     covid_keywords = ["COVID", "coronavirus", "pandemic", "vaccine", "mask", "quarantine", "lockdown"]
     base_url = "https://www.politifact.com/factchecks/list/?page="
     new_claims = []
@@ -50,27 +51,32 @@ def scrape_politifact_covid(min_claims=50, max_pages=50):
 
                 # ✅ Filter only COVID-related claims
                 if any(keyword.lower() in claim_text.lower() for keyword in covid_keywords):
-                    # ✅ Map labels (1 = Fake, 0 = Real)
                     is_fake = label_mapping.get(verdict, None)
-
-                    # ✅ Preprocess text
-                    cleaned_text = preprocess(claim_text)
+                    cleaned_text = preprocess(claim_text)  # ✅ Preprocess before classification
 
                     # ✅ Check if claim already exists in MongoDB
-                    existing_claim = collection.find_one({"Claim": claim_text})
-                    if existing_claim:
+                    if collection.find_one({"Claim": claim_text}):
                         print(f"🔄 Claim already exists: {claim_text[:50]}... Skipping.")
-                        continue  # Skip duplicates
+                        continue
 
-                    # ✅ Only store if label is recognized
+                    # ✅ Only process if label is recognized
                     if is_fake is not None:
+                        # ✅ Classify using the BERT model
+                        probability_fake = predict_fake(cleaned_text)
+                        probability_real = 1 - probability_fake
+                        predicted_label = "Fake" if probability_fake > 0.5 else "Real"
+
+                        # ✅ Create document with classification
                         doc = {
                             "Claim": claim_text,
-                            "Label": verdict.capitalize(),  # Ensure consistent casing
-                            "is_fake": is_fake,  # Binary label
+                            "Label": verdict.capitalize(),
+                            "is_fake": is_fake,
                             "clean_text": cleaned_text,
                             "Source": source_link,
-                            "Date": date
+                            "Date": date,
+                            "probability_fake": probability_fake,
+                            "probability_real": probability_real,
+                            "predicted_label": predicted_label
                         }
                         new_claims.append(doc)
 
@@ -81,35 +87,11 @@ def scrape_politifact_covid(min_claims=50, max_pages=50):
         page += 1
         time.sleep(1)  # Be respectful to Politifact's server
 
-    # ✅ Insert only NEW claims into MongoDB
+    # ✅ Insert classified claims into MongoDB
     if new_claims:
         collection.insert_many(new_claims)
-        print(f"✅ Inserted {len(new_claims)} new labeled claims into MongoDB!")
-
-from classify_news import predict_fake
+        print(f"✅ Inserted {len(new_claims)} classified claims into MongoDB!")
 
 def fetch_new_politifact_claims(min_claims=10, max_pages=12):
-    """Fetch and store new Politifact claims in MongoDB."""
+    """Fetch and store new classified Politifact claims in MongoDB."""
     scrape_politifact_covid(min_claims=min_claims, max_pages=max_pages)
-
-    # ✅ Fetch new claims that are missing classification
-    unclassified_claims = list(collection.find({"probability_fake": {"$exists": False}}))
-
-    if unclassified_claims:
-        for claim in unclassified_claims:
-            claim_text = claim["clean_text"]
-            probability_fake = predict_fake(claim_text)
-            probability_real = 1 - probability_fake
-            predicted_label = "Fake" if probability_fake > 0.5 else "Real"
-
-            # ✅ Update MongoDB with classification results
-            collection.update_one(
-                {"_id": claim["_id"]},
-                {"$set": {
-                    "probability_fake": probability_fake,
-                    "probability_real": probability_real,
-                    "predicted_label": predicted_label
-                }}
-            )
-
-        print(f"✅ Classified {len(unclassified_claims)} newly fetched claims!")
