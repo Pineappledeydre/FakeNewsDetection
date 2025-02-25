@@ -11,7 +11,13 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../scri
 
 # Load MongoDB credentials
 load_dotenv()
-print(f"MONGO_URI: {os.getenv('MONGO_URI')}")
+
+# ✅ Manually force MONGO_URI if missing
+MONGO_URI = os.getenv("MONGO_URI", "missing")
+
+if MONGO_URI == "missing":
+    st.error("❌ MONGO_URI is missing! Check your GitHub Actions Secrets.")
+    st.stop()
 
 # ✅ Import database after ensuring MONGO_URI is loaded
 from database import collection
@@ -33,7 +39,7 @@ try:
 except Exception as e:
     st.error(f"❌ Failed to connect to MongoDB: {e}")
     st.stop()
-
+    
 # ✅ App Title
 st.title("📰 Fake News Detector - Politifact")
 
