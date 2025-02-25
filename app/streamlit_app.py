@@ -83,6 +83,33 @@ except Exception as e:
     st.error(f"❌ Error fetching classified claims: {e}")
 
 # ==============================================
+# 📊 **Visualization of Fake vs. Real News**
+# ==============================================
+st.header("📊 Fake vs. Real News Distribution")
+
+# ✅ Fetch latest predictions from MongoDB
+try:
+    df = pd.DataFrame(list(collection.find({}, {"Claim": 1, "probability_fake": 1, "probability_real": 1, "predicted_label": 1})))
+
+    if not df.empty:
+        # ✅ Convert labels for visualization
+        df["predicted_label"] = df["predicted_label"].map({1: "Fake", 0: "Real"})
+        
+        # ✅ Count Fake vs. Real
+        label_counts = df["predicted_label"].value_counts()
+
+        # ✅ Display as Bar Chart
+        st.bar_chart(label_counts)
+
+        # ✅ Show table with results
+        st.subheader("🔍 Full Classification Results")
+        st.dataframe(df[["Claim", "predicted_label", "probability_fake", "probability_real"]])
+    else:
+        st.info("No classified claims found.")
+except Exception as e:
+    st.error(f"❌ Error fetching classified claims: {e}")
+
+# ==============================================
 # 📝 **Classify User's Input**
 # ==============================================
 st.header("📝 Classify Your Own Claim")
