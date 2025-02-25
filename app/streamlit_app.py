@@ -2,20 +2,16 @@ import streamlit as st
 import pymongo
 import torch
 from dotenv import load_dotenv
-
 import sys
 import os
 
 # ✅ Load .env file (for local testing)
 load_dotenv()
 
-# ✅ Debug: Print all secrets
-st.write("🔍 **Streamlit Secrets:**", st.secrets)
-
 # ✅ Debug: Print all environment variables
 st.write("🔍 **All Environment Variables:**", os.environ)
 
-# ✅ Try fetching MONGO_URI from Streamlit Secrets OR OS Environment
+# ✅ Fetch MONGO_URI from Streamlit Secrets OR OS Environment
 MONGO_URI = st.secrets.get("MONGO_URI") or os.getenv("MONGO_URI")
 
 # ✅ If still missing, show error
@@ -25,13 +21,18 @@ if not MONGO_URI:
 else:
     st.success("✅ `MONGO_URI` Loaded!")
 
-# Add the `scripts` directory to the Python path
+# ✅ Add `scripts` directory to Python path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../scripts')))
+
+# ✅ Import only AFTER ensuring MONGO_URI is set
 from database import collection
 from preprocess import preprocess
-from classify_news import model, tokenizer
+import classify_news  # ✅ Load `model, tokenizer` from `classify_news`
 
-# Connect to MongoDB
+model = classify_news.model
+tokenizer = classify_news.tokenizer
+
+# ✅ Connect to MongoDB
 try:
     client = pymongo.MongoClient(MONGO_URI)
     db = client["FakeNewsDB"]
