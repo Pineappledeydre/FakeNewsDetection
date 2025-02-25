@@ -2,19 +2,15 @@ import streamlit as st
 import pymongo
 import torch
 from dotenv import load_dotenv
-import sys
 import os
+import sys
 
-# ✅ Load .env file (for local testing)
+# ✅ Load environment variables
 load_dotenv()
 
-# ✅ Debug: Print all environment variables
-st.write("🔍 **All Environment Variables:**", os.environ)
-
-# ✅ Fetch MONGO_URI from Streamlit Secrets OR OS Environment
+# ✅ Fetch `MONGO_URI`
 MONGO_URI = st.secrets.get("MONGO_URI") or os.getenv("MONGO_URI")
 
-# ✅ If still missing, show error
 if not MONGO_URI:
     st.error("❌ `MONGO_URI` is missing! Check Streamlit Secrets or GitHub Secrets.")
     st.stop()
@@ -24,13 +20,19 @@ else:
 # ✅ Add `scripts` directory to Python path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../scripts')))
 
-# ✅ Import only AFTER ensuring MONGO_URI is set
+# ✅ Import necessary modules
 from database import collection
 from preprocess import preprocess
-import classify_news  # ✅ Load `model, tokenizer` from `classify_news`
+import classify_news
 
-model = classify_news.model
-tokenizer = classify_news.tokenizer
+# ✅ Check if model was loaded successfully
+if classify_news.model is None:
+    st.error("❌ Model is missing! Please upload `models/bert_finetuned_model.pth`.")
+    st.stop()
+else:
+    model = classify_news.model
+    tokenizer = classify_news.tokenizer
+    st.success("✅ Model and tokenizer loaded!")
 
 # ✅ Connect to MongoDB
 try:
