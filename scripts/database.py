@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 
 # Load environment variables
 load_dotenv()
+print(f"MONGO_URI: {os.getenv('MONGO_URI')}")
 
 # Get MongoDB URI from environment
 MONGO_URI = os.getenv("MONGO_URI")
