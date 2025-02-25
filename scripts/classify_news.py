@@ -79,9 +79,6 @@ if "clean_text" not in df.columns:
     print("⚠️ 'clean_text' column is missing! Creating an empty column.")
     df["clean_text"] = df["Claim"].apply(lambda x: preprocess(x) if isinstance(x, str) else "")
 
-# ✅ Ensure all text is preprocessed before classification
-df["clean_text"] = df["clean_text"].apply(lambda x: preprocess(x) if isinstance(x, str) else "")
-
 # ✅ Run BERT Classification
 def predict_fake(text):
     """Predicts the probability of fake news using BERT"""
