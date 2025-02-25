@@ -96,7 +96,7 @@ try:
         sizes = [80, 20]  # Example: 80% Fake, 20% Real
         colors = ["#E74C3C", "#2ECC71"]  # Red for Fake, Green for Real
         explode = [0.05, 0] 
-        fig, ax = plt.subplots(figsize=(1,1), dpi=500)  
+        fig, ax = plt.subplots(figsize=(1,1), dpi=200)  
         
         wedges, texts, autotexts = ax.pie(
             sizes,
@@ -112,7 +112,7 @@ try:
         ax.set_title("Fake vs. Real News", fontsize=6, fontweight="bold", pad=2)
         ax.axis("equal") 
         chart_path = "chart.png"
-        fig.savefig(chart_path, bbox_inches="tight", dpi=500)  
+        fig.savefig(chart_path, bbox_inches="tight", dpi=200)  
         st.image(chart_path, caption="Fake vs. Real News", use_container_width=True, width=120) 
             
         ############################################################################
