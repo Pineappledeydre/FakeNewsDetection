@@ -96,7 +96,7 @@ try:
         colors = ["#E74C3C", "#2ECC71"]  # Red for Fake, Green for Real
         explode = [0.05, 0]  # Slightly explode the Fake slice for emphasis
         
-        fig, ax = plt.subplots(figsize=(0.6,0.6), dpi=3000)  # High DPI for clarity
+        fig, ax = plt.subplots(figsize=(0.5,0.5), dpi=4000)  # High DPI for clarity
         
         wedges, texts, autotexts = ax.pie(
             sizes,
@@ -106,10 +106,10 @@ try:
             colors=colors,
             startangle=140,
             wedgeprops={'linewidth': 0.5, 'edgecolor': 'black'},
-            textprops={'fontsize': 5, 'weight': 'bold'}  
+            textprops={'fontsize': 2, 'weight': 'bold'}  
         )
         
-        ax.set_title("Fake vs. Real News", fontsize=8, fontweight="bold", pad=2)
+        ax.set_title("Fake vs. Real News", fontsize=5, fontweight="bold", pad=2)
         ax.axis("equal") 
         
         st.pyplot(fig, bbox_inches="tight")
