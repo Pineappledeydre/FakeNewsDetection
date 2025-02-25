@@ -3,7 +3,7 @@ name: Deploy Streamlit App
 on:
   push:
     branches:
-      - main 
+      - main
   pull_request:
     branches:
       - main
@@ -21,17 +21,13 @@ jobs:
       - name: Debug Environment Variables
         run: env | grep MONGO_URI
 
-      - name: Deploy Streamlit
-        run: streamlit run app/streamlit_app.py
-        env:
-          MONGO_URI: ${{ secrets.MONGO_URI }}
-
       - name: Install Dependencies
         run: |
+          pip install --upgrade pip
           pip install -r requirements.txt
           pip install streamlit
 
       - name: Run Streamlit App
-        run: streamlit run app/streamlit_app.py
+        run: streamlit run app/streamlit_app.py --server.port 8501 --server.headless true
         env:
           MONGO_URI: ${{ secrets.MONGO_URI }}
