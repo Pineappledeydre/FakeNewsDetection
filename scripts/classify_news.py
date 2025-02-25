@@ -25,9 +25,16 @@ class BertClassifier(nn.Module):
         dropout_output = self.dropout(pooled_output)
         return self.sigmoid(self.fc(dropout_output))
 
-# ✅ Load Model & Tokenizer
+# ✅ Load Tokenizer FIRST
+try:
+    tokenizer = BertTokenizer.from_pretrained("bert-base-uncased")
+    print("✅ Tokenizer loaded successfully!")
+except Exception as e:
+    print(f"❌ Error loading tokenizer: {e}")
+    tokenizer = None  # Handle errors gracefully
+
+# ✅ Load Model
 model = None
-tokenizer = BertTokenizer.from_pretrained("bert-base-uncased")  # ✅ Load tokenizer globally
 
 def load_model():
     global model
