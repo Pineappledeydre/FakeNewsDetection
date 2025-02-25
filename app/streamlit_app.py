@@ -40,7 +40,7 @@ except Exception as e:
 st.title("📰 Fake News Detector - Politifact")
 
 # Fetch New Claims from Politifact
-st.header("🔄 Fetch New Fact-Checked Claims")
+st.markdown("<h4 style='font-size:16px; font-weight:bold;'>🔄 Fetch New Fact-Checked Claims</h4>", unsafe_allow_html=True)
 col1, col2 = st.columns(2)
 with col1:
     min_claims = st.slider("Number of Claims:", 10, 100, 50, 10)
@@ -62,11 +62,12 @@ try:
 
     if docs:
         for doc in docs:
-            st.markdown(f"<p style='font-size:14px; font-weight:bold;'>📌 {doc.get('Claim', 'Unknown Claim')}</p>", unsafe_allow_html=True)
+            st.markdown(f"<p style='font-size:14px; font-weight:bold;'>🧷 {doc.get('Claim', 'Unknown Claim')}</p>", unsafe_allow_html=True)
             predicted_label = "Fake" if doc.get("is_fake", 1) == 1 else "Real"
-            st.write(f"🗂 **Label**: {predicted_label}")
-            st.write(f"**Fake Probability**: {doc.get('probability_fake', 0):.2%}")
+            st.markdown(f"<p style='font-size:12px;'><b>Label:</b> {predicted_label}</p>", unsafe_allow_html=True)
+            st.markdown(f"<p style='font-size:12px;'><b>Fake Probability:</b> {doc.get('probability_fake', 0):.2%}</p>", unsafe_allow_html=True)
             st.divider()
+
     else:
         st.info("No classified claims found in MongoDB.")
 except Exception as e:
