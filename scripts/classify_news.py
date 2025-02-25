@@ -58,24 +58,26 @@ def load_model():
 # ✅ Call model loading function
 load_model()
 
-
-
-def tokenize_text(text):
-    """Tokenizes text for BERT"""
-    encoding = tokenizer.encode_plus(
-        text, max_length=128, truncation=True, padding='max_length', return_tensors='pt'
-    )
-    return encoding["input_ids"], encoding["attention_mask"]
-
-# ✅ Fetch latest claims from MongoDB
+# ✅ Debug MongoDB Query
+print("🔍 Fetching latest claims from MongoDB...")
 claims = list(collection.find({}, {"Claim": 1, "is_fake": 1, "clean_text": 1}))
 
-# ✅ Handle empty database case
-if not claims:
-    print("⚠️ No data found in MongoDB!")
-    exit()
+# ✅ Debug: Print sample MongoDB documents
+if claims:
+    print("🔍 Sample MongoDB Data:", claims[:5])  # Check if clean_text exists
+else:
+    print("⚠️ No documents found in MongoDB!")
 
+# ✅ Convert to DataFrame
 df = pd.DataFrame(claims)
+
+# ✅ Debug: Print DataFrame columns
+print("🔍 DataFrame Columns:", df.columns)
+
+# ✅ Handle Missing "clean_text" Column
+if "clean_text" not in df.columns:
+    print("⚠️ 'clean_text' column is missing! Creating an empty column.")
+    df["clean_text"] = df["Claim"].apply(lambda x: preprocess(x) if isinstance(x, str) else "")
 
 # ✅ Ensure all text is preprocessed before classification
 df["clean_text"] = df["clean_text"].apply(lambda x: preprocess(x) if isinstance(x, str) else "")
@@ -83,7 +85,9 @@ df["clean_text"] = df["clean_text"].apply(lambda x: preprocess(x) if isinstance(
 # ✅ Run BERT Classification
 def predict_fake(text):
     """Predicts the probability of fake news using BERT"""
-    input_ids, attention_mask = tokenize_text(text)
+    input_ids, attention_mask = tokenizer.encode_plus(
+        text, max_length=128, truncation=True, padding='max_length', return_tensors='pt'
+    ).values()
     
     with torch.no_grad():
         output = model(input_ids, attention_mask)
