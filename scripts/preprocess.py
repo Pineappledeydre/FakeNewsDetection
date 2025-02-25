@@ -4,11 +4,9 @@ import gensim
 import nltk
 from nltk.corpus import stopwords
 
-# Download necessary NLTK data
 nltk.download('stopwords')
 nltk.download('wordnet')
 
-# Load stopwords
 stop_words = stopwords.words('english')
 stop_words.extend(['from', 'subject', 're', 'edu', 'use', 'https', '.com'])
 
