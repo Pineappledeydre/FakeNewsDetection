@@ -97,7 +97,7 @@ try:
         explode = [0.05, 0]  # Slightly explode the Fake slice for emphasis
         
         # Create a Small & Sharp Pie Chart
-        fig, ax = plt.subplots(figsize=(2, 2), dpi=600)  # High DPI for clarity
+        fig, ax = plt.subplots(figsize=(1,1), dpi=600)  # High DPI for clarity
         
         wedges, texts, autotexts = ax.pie(
             sizes,
