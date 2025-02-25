@@ -80,6 +80,8 @@ try:
     df = pd.DataFrame(list(collection.find({}, {"Claim": 1, "probability_fake": 1, "probability_real": 1, "is_fake": 1})))
 
     if not df.empty:
+        accuracy = df["correct"].mean() * 100  
+        #accuracy_text = f"{accuracy:.2f}%"  
         label_counts = df["is_fake"].value_counts()
         labels = ["Fake", "Real"]
         sizes = [label_counts.get(1, 0), label_counts.get(0, 0)] 
