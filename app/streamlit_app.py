@@ -80,15 +80,12 @@ try:
     df = pd.DataFrame(list(collection.find({}, {"Claim": 1, "probability_fake": 1, "probability_real": 1, "is_fake": 1})))
 
     if not df.empty:
-        # ✅ Count Fake vs. Real for visualization
         label_counts = df["is_fake"].value_counts()
         labels = ["Fake", "Real"]
-        sizes = [label_counts.get(1, 0), label_counts.get(0, 0)]  # Get counts safely
-        colors = ["#E74C3C", "#2ECC71"]  # Red for Fake, Green for Real
-        explode = [0.05, 0]  # Slightly separate Fake slice
-    
-        # ✅ **Create High-Quality Pie Chart**
-        fig, ax = plt.subplots(figsize=(2, 2), dpi=300)  # Small but high-resolution
+        sizes = [label_counts.get(1, 0), label_counts.get(0, 0)] 
+        colors = ["#E74C3C", "#2ECC71"]  
+        explode = [0.05, 0]  
+        fig, ax = plt.subplots(figsize=(2, 2), dpi=300)  
     
         wedges, texts, autotexts = ax.pie(
             sizes,
@@ -97,18 +94,15 @@ try:
             autopct='%1.0f%%',
             colors=colors,
             startangle=140,
-            wedgeprops={'linewidth': 0.5, 'edgecolor': 'black'},
-            textprops={'fontsize': 6, 'weight': 'bold'}  # Small, clear text
+            textprops={'fontsize': 6, 'weight': 'bold'}  
         )
     
         ax.set_title("Fake vs. Real News", fontsize=6, fontweight="bold", pad=2)
-        ax.axis("equal")  # Ensures **perfect circle**
-    
-        # ✅ **Save as Image & Display in Streamlit**
+        ax.axis("equal")  
         chart_path = "chart.png"
-        fig.savefig(chart_path, bbox_inches="tight", dpi=300)  # High DPI for clarity
+        fig.savefig(chart_path, bbox_inches="tight", dpi=300) 
     
-        st.image(chart_path, caption="Fake vs. Real News", use_container_width=True, width=120)  # Small, sharp image
+        st.image(chart_path, caption="Fake vs. Real News", use_container_width=True, width=120)  
 
         ############################################################################
         
