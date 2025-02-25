@@ -86,39 +86,38 @@ try:
 
         df["correct"] = df["predicted_label"] == df["actual_label"]
         accuracy = df["correct"].mean() * 100  
+
         label_counts = df["predicted_label"].value_counts()
-        labels = ["Fake", "Real"]
-        sizes = [label_counts.get("Fake", 0), label_counts.get("Real", 0)]  
-        colors = ["#E74C3C", "#2ECC71"]
-        explode = [0.05, 0] 
-
-        fig, ax = plt.subplots(figsize=(2, 2), dpi=300)
+        fig, ax = plt.subplots(figsize=(1, 1), dpi=200) 
+        
+        colors = ["#E74C3C", "#2ECC71"]  
+        num_slices = len(label_counts)
+        explode = [0.05 if i == 0 else 0 for i in range(num_slices)]  
+        
         wedges, texts, autotexts = ax.pie(
-            sizes,
-            explode=explode,
-            labels=labels,
-            autopct='%1.0f%%',
-            colors=colors,
-            startangle=140,
-            textprops={'fontsize': 6, 'weight': 'bold'}
+            label_counts, 
+            labels=label_counts.index, 
+            autopct='%1.0f%%', 
+            colors=colors[:num_slices], 
+            startangle=140, 
+            explode=explode,  
+            wedgeprops={'linewidth': 0.5, 'edgecolor': 'black'},  
+            textprops={'fontsize': 6}  
         )
-        ax.set_title("Fake vs. Real News", fontsize=6, fontweight="bold", pad=2)
-        ax.axis("equal")
-
+        
+        for text in texts:
+            text.set_fontsize(5) 
+        for autotext in autotexts:
+            autotext.set_fontsize(5)  
+        
+        ax.set_title("Fake vs. Real News", fontsize=8, fontweight="bold")
         st.pyplot(fig)
-
+#####################################################################################
+        
         st.markdown(f"""
-            <p style="font-size:14px; font-weight:bold; margin-bottom:2px;">Model Accuracy</p>
-            <p style="font-size:12px; margin-top:0px;">{accuracy:.2f}%</p>
+            <p style="font-size:16px; font-weight:bold; margin-bottom:2px;">Model Accuracy</p>
+            <p style="font-size:14px; margin-top:0px;">{accuracy:.2f}%</p>
         """, unsafe_allow_html=True)
-
-        st.markdown("<h4 style='font-size:14px; font-weight:bold;'>🔍 Full Classification Results</h4>", unsafe_allow_html=True)
-        st.dataframe(df[["Claim", "predicted_label", "actual_label", "probability_fake", "probability_real"]])
-
-    else:
-        st.info("No classified claims found.")
-
-        ############################################################################
 
         st.markdown("<h4 style='font-size:16px; font-weight:bold;'>🔍 Full Classification Results</h4>", unsafe_allow_html=True)
         st.dataframe(df[["Claim", "predicted_label", "actual_label", "probability_fake", "probability_real"]])
