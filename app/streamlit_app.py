@@ -87,9 +87,8 @@ try:
         accuracy = df["correct"].mean() * 100  
 
         label_counts = df["predicted_label"].value_counts()
-
-
-        fig, ax = plt.subplots(figsize=(1, 1), dpi=200)  # Reduce figure size + increase DPI for clarity
+        
+        fig, ax = plt.subplots(figsize=(1, 1), dpi=300)  # Tiny size + higher DPI for clarity
         
         colors = ["#E74C3C", "#2ECC71"]  # Red for Fake, Green for Real
         num_slices = len(label_counts)
@@ -103,18 +102,21 @@ try:
             colors=colors[:num_slices], 
             startangle=140, 
             explode=explode,  
-            wedgeprops={'linewidth': 0.5, 'edgecolor': 'black'},  # Even thinner edge lines
-            textprops={'fontsize': 6}  # Reduce font size further
+            wedgeprops={'linewidth': 0.3, 'edgecolor': 'black'},  # Very thin edges
+            textprops={'fontsize': 4, 'weight': 'light'}  # Even smaller text
         )
         
-        # Reduce the text size for labels and percentage values
+        # Reduce font size for labels & percentages
         for text in texts:
-            text.set_fontsize(5)  # Labels smaller
+            text.set_fontsize(3)  # Labels smallest
         for autotext in autotexts:
-            autotext.set_fontsize(5)  # Percentages smaller
+            autotext.set_fontsize(3)  # Percentages smallest
         
-        ax.set_title("Fake vs. Real News", fontsize=8, fontweight="bold")  # Even smaller title
+        ax.set_title("Fake vs. Real News", fontsize=6, fontweight="bold", pad=2)  # Shrink title & reduce padding
         st.pyplot(fig)
+
+
+        
         st.markdown(f"""
             <p style="font-size:16px; font-weight:bold; margin-bottom:2px;">Model Accuracy</p>
             <p style="font-size:14px; margin-top:0px;">{accuracy:.2f}%</p>
