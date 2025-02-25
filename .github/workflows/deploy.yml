@@ -11,13 +11,20 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
+      - name: Set MONGO_URI in Environment
+        run: echo "MONGO_URI=${{ secrets.MONGO_URI }}" >> $GITHUB_ENV
+
       - name: Debug Environment Variables
-        run: env
+        run: env | grep MONGO_URI
+
+      - name: Deploy Streamlit
+        run: streamlit run app/streamlit_app.py
+        env:
+          MONGO_URI: ${{ secrets.MONGO_URI }}
 
       - name: Install Dependencies
         run: |
