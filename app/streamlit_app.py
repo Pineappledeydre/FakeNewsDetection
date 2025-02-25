@@ -25,12 +25,13 @@ if not MONGO_URI:
 else:
     st.success("✅ `MONGO_URI` Loaded!")
 
-# ✅ Import database AFTER ensuring MONGO_URI is set
+# Add the `scripts` directory to the Python path
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../scripts')))
 from database import collection
 from preprocess import preprocess
 from classify_news import model, tokenizer
 
-# ✅ Connect to MongoDB
+# Connect to MongoDB
 try:
     client = pymongo.MongoClient(MONGO_URI)
     db = client["FakeNewsDB"]
