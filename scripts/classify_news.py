@@ -27,7 +27,7 @@ class BertClassifier(nn.Module):
 
 # ✅ Load Model & Tokenizer
 model = None
-tokenizer = BertTokenizer.from_pretrained("bert-base-uncased")  # Load tokenizer even if model is missing
+tokenizer = BertTokenizer.from_pretrained("bert-base-uncased")  # ✅ Load tokenizer globally
 
 def load_model():
     global model
@@ -49,6 +49,7 @@ def load_model():
 
 # ✅ Call model loading function
 load_model()
+
 
 
 def tokenize_text(text):
