@@ -1,20 +1,26 @@
 import streamlit as st
 import pymongo
-import os
 import torch
 from dotenv import load_dotenv
 from classify_news import model, tokenizer  # Load model from classify_news.py
 from preprocess import preprocess  # Load text preprocessing
 
-# ✅ Load MongoDB credentials
+import sys
+import os
+
+# the scripts directory --> sys.path
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../scripts')))
+
+# Load MongoDB credentials
 load_dotenv()
+
 MONGO_URI = os.getenv("MONGO_URI")
 
 if not MONGO_URI:
     st.error("❌ MongoDB connection string is missing! Check your .env file or GitHub Secrets.")
     st.stop()
 
-# ✅ Connect to MongoDB
+# Connect to MongoDB
 try:
     client = pymongo.MongoClient(MONGO_URI)
     db = client["FakeNewsDB"]
