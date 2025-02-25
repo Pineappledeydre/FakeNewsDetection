@@ -9,11 +9,14 @@ import os
 # the scripts directory --> sys.path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../scripts')))
 
-from classify_news import model, tokenizer  # Load model from classify_news.py
-from preprocess import preprocess  # Load text preprocessing
-
 # Load MongoDB credentials
 load_dotenv()
+print(f"MONGO_URI: {os.getenv('MONGO_URI')}")
+
+# ✅ Import database after ensuring MONGO_URI is loaded
+from database import collection
+from preprocess import preprocess
+from classify_news import model, tokenizer
 
 MONGO_URI = os.getenv("MONGO_URI")
 
