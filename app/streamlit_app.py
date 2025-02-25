@@ -37,10 +37,10 @@ except Exception as e:
     st.error(f"‼️ Failed to connect to MongoDB: {e}")
     st.stop()
 
-st.markdown("<h4 style='font-size:14px; font-weight:bold;'>📰 Fake News Detector - Covid 19</h4>", unsafe_allow_html=True)
+st.markdown("<h4 style='font-size:20px; font-weight:bold;'>📰 Fake News Detector - Covid 19</h4>", unsafe_allow_html=True)
 
 # Fetch New Claims from Politifact
-st.markdown("<h4 style='font-size:12px; font-weight:bold;'>🔄 Fetch New Fact-Checked Claims</h4>", unsafe_allow_html=True)
+st.markdown("<h4 style='font-size:16px; font-weight:bold;'>🔄 Fetch New Fact-Checked Claims</h4>", unsafe_allow_html=True)
 col1, col2 = st.columns(2)
 with col1:
     min_claims = st.slider("Number of Claims:", 10, 100, 50, 10)
