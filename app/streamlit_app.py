@@ -6,24 +6,26 @@ from dotenv import load_dotenv
 import sys
 import os
 
-# the scripts directory --> sys.path
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../scripts')))
-
-# Load MongoDB credentials
+# ✅ Load .env file (for local testing)
 load_dotenv()
 
-env_vars = os.environ
-st.write("🔍 **All Environment Variables:**")
-st.write(env_vars)
+# ✅ Debug: Print all secrets
+st.write("🔍 **Streamlit Secrets:**", st.secrets)
 
-# ✅ Manually force MONGO_URI if missing
-MONGO_URI = st.secrets["MONGO_URI"]
+# ✅ Debug: Print all environment variables
+st.write("🔍 **All Environment Variables:**", os.environ)
 
+# ✅ Try fetching MONGO_URI from Streamlit Secrets OR OS Environment
+MONGO_URI = st.secrets.get("MONGO_URI") or os.getenv("MONGO_URI")
+
+# ✅ If still missing, show error
 if not MONGO_URI:
-    st.error("❌ MONGO_URI is missing! Check `.streamlit/secrets.toml` or GitHub Secrets.")
+    st.error("❌ `MONGO_URI` is missing! Check Streamlit Secrets or GitHub Secrets.")
     st.stop()
-    
-# ✅ Import database after ensuring MONGO_URI is loaded
+else:
+    st.success("✅ `MONGO_URI` Loaded!")
+
+# ✅ Import database AFTER ensuring MONGO_URI is set
 from database import collection
 from preprocess import preprocess
 from classify_news import model, tokenizer
