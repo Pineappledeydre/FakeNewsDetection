@@ -76,10 +76,9 @@ try:
         for doc in docs:
             st.subheader(f"📌 {doc.get('Claim', 'Unknown Claim')}")
             
-            # ✅ Fix: Use `predicted_label` if available, otherwise show `Label`
-            label = doc.get("predicted_label") or doc.get("Label", "Not classified")
-            
-            st.write(f"🗂 **Label**: {label}")
+            # Convert `is_fake` to 'Fake' or 'Real'
+            predicted_label = "Fake" if doc.get("is_fake", 1) == 1 else "Real"
+            st.write(f"🗂 **Label**: {predicted_label}")            
             st.write(f"📊 **Fake Probability**: {doc.get('probability_fake', 0):.2%}")
             st.write("---")
     else:
