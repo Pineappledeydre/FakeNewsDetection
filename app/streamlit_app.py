@@ -80,24 +80,16 @@ try:
     df = pd.DataFrame(list(collection.find({}, {"Claim": 1, "probability_fake": 1, "probability_real": 1, "is_fake": 1})))
 
     if not df.empty:
-        df["predicted_label"] = df["probability_fake"].apply(lambda x: "Fake" if x > 0.5 else "Real")
-        df["actual_label"] = df["is_fake"].apply(lambda x: "Fake" if x == 1 else "Real")
-
-        df["correct"] = df["predicted_label"] == df["actual_label"]
-        accuracy = df["correct"].mean() * 100  
-
-        label_counts = df["predicted_label"].value_counts()
-        
-        ############################################################################
-        import numpy as np
-        from PIL import Image
-        
+        # ✅ Count Fake vs. Real for visualization
+        label_counts = df["is_fake"].value_counts()
         labels = ["Fake", "Real"]
-        sizes = [80, 20]  # Example: 80% Fake, 20% Real
+        sizes = [label_counts.get(1, 0), label_counts.get(0, 0)]  # Get counts safely
         colors = ["#E74C3C", "#2ECC71"]  # Red for Fake, Green for Real
-        explode = [0.05, 0] 
-        fig, ax = plt.subplots(figsize=(1,1), dpi=1000)  
-        
+        explode = [0.05, 0]  # Slightly separate Fake slice
+    
+        # ✅ **Create High-Quality Pie Chart**
+        fig, ax = plt.subplots(figsize=(2, 2), dpi=300)  # Small but high-resolution
+    
         wedges, texts, autotexts = ax.pie(
             sizes,
             explode=explode,
@@ -106,16 +98,18 @@ try:
             colors=colors,
             startangle=140,
             wedgeprops={'linewidth': 0.5, 'edgecolor': 'black'},
-            textprops={'fontsize': 5, 'weight': 'bold'}  
+            textprops={'fontsize': 6, 'weight': 'bold'}  # Small, clear text
         )
-        
+    
         ax.set_title("Fake vs. Real News", fontsize=6, fontweight="bold", pad=2)
-        ax.axis("equal") 
+        ax.axis("equal")  # Ensures **perfect circle**
+    
+        # ✅ **Save as Image & Display in Streamlit**
         chart_path = "chart.png"
-        fig.savefig(chart_path, bbox_inches="tight", dpi=1000)  
-        st.image(chart_path, caption="Fake vs. Real News", 
-                 use_container_width=True, width=80) 
-            
+        fig.savefig(chart_path, bbox_inches="tight", dpi=300)  # High DPI for clarity
+    
+        st.image(chart_path, caption="Fake vs. Real News", use_container_width=True, width=120)  # Small, sharp image
+
         ############################################################################
         
         st.markdown(f"""
