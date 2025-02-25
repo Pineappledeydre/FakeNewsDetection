@@ -76,19 +76,23 @@ except Exception as e:
 # Fake vs. Real News Distribution
 st.markdown("<h4 style='font-size:16px; font-weight:bold;'>🦕 Fake vs. Real News Distribution 🦖</h4>", unsafe_allow_html=True)
 
+####################################################################################################
 try:
     df = pd.DataFrame(list(collection.find({}, {"Claim": 1, "probability_fake": 1, "probability_real": 1, "is_fake": 1})))
 
     if not df.empty:
+        df["predicted_label"] = df["probability_fake"].apply(lambda x: "Fake" if x > 0.5 else "Real")
+        df["actual_label"] = df["is_fake"].apply(lambda x: "Fake" if x == 1 else "Real")
+
+        df["correct"] = df["predicted_label"] == df["actual_label"]
         accuracy = df["correct"].mean() * 100  
-        #accuracy_text = f"{accuracy:.2f}%"  
-        label_counts = df["is_fake"].value_counts()
+        label_counts = df["predicted_label"].value_counts()
         labels = ["Fake", "Real"]
-        sizes = [label_counts.get(1, 0), label_counts.get(0, 0)] 
-        colors = ["#E74C3C", "#2ECC71"]  
-        explode = [0.05, 0]  
-        fig, ax = plt.subplots(figsize=(2, 2), dpi=300)  
-    
+        sizes = [label_counts.get("Fake", 0), label_counts.get("Real", 0)]  
+        colors = ["#E74C3C", "#2ECC71"]
+        explode = [0.05, 0] 
+
+        fig, ax = plt.subplots(figsize=(2, 2), dpi=300)
         wedges, texts, autotexts = ax.pie(
             sizes,
             explode=explode,
@@ -96,22 +100,25 @@ try:
             autopct='%1.0f%%',
             colors=colors,
             startangle=140,
-            textprops={'fontsize': 6, 'weight': 'bold'}  
+            textprops={'fontsize': 6, 'weight': 'bold'}
         )
-    
         ax.set_title("Fake vs. Real News", fontsize=6, fontweight="bold", pad=2)
-        ax.axis("equal")  
-        chart_path = "chart.png"
-        fig.savefig(chart_path, bbox_inches="tight", dpi=300) 
-    
-        st.image(chart_path, caption="Fake vs. Real News", use_container_width=True, width=120)  
+        ax.axis("equal")
+
+        st.pyplot(fig)
+
+        st.markdown(f"""
+            <p style="font-size:14px; font-weight:bold; margin-bottom:2px;">Model Accuracy</p>
+            <p style="font-size:12px; margin-top:0px;">{accuracy:.2f}%</p>
+        """, unsafe_allow_html=True)
+
+        st.markdown("<h4 style='font-size:14px; font-weight:bold;'>🔍 Full Classification Results</h4>", unsafe_allow_html=True)
+        st.dataframe(df[["Claim", "predicted_label", "actual_label", "probability_fake", "probability_real"]])
+
+    else:
+        st.info("No classified claims found.")
 
         ############################################################################
-        
-        st.markdown(f"""
-            <p style="font-size:16px; font-weight:bold; margin-bottom:2px;">Model Accuracy</p>
-            <p style="font-size:14px; margin-top:0px;">{accuracy:.2f}%</p>
-        """, unsafe_allow_html=True)
 
         st.markdown("<h4 style='font-size:16px; font-weight:bold;'>🔍 Full Classification Results</h4>", unsafe_allow_html=True)
         st.dataframe(df[["Claim", "predicted_label", "actual_label", "probability_fake", "probability_real"]])
