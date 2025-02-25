@@ -75,7 +75,11 @@ try:
     if docs:
         for doc in docs:
             st.subheader(f"📌 {doc.get('Claim', 'Unknown Claim')}")
-            st.write(f"🗂 **Label**: {doc.get('predicted_label', 'Not classified')}")
+            
+            # ✅ Fix: Use `predicted_label` if available, otherwise show `Label`
+            label = doc.get("predicted_label") or doc.get("Label", "Not classified")
+            
+            st.write(f"🗂 **Label**: {label}")
             st.write(f"📊 **Fake Probability**: {doc.get('probability_fake', 0):.2%}")
             st.write("---")
     else:
@@ -142,9 +146,14 @@ if st.button("🔎 Analyze Claim"):
             # ✅ Save to MongoDB
             collection.insert_one({
                 "Claim": user_input,
+                "Label": "Not classified",  # Default, will update later
+                "is_fake": 1 if predicted_label == "Fake" else 0,
+                "clean_text": cleaned_text,
+                "Source": "User Submitted",
+                "Date": "Unknown",
                 "probability_fake": probability_fake,
                 "probability_real": probability_real,
-                "predicted_label": predicted_label
+                "predicted_label": predicted_label,  # ✅ Now stored!
             })
             st.success("✅ Claim added to MongoDB for tracking!")
 
