@@ -60,11 +60,11 @@ load_model()
 
 # ✅ Debug MongoDB Query
 print("🔍 Fetching latest claims from MongoDB...")
-claims = list(collection.find({}, {"Claim": 1, "is_fake": 1, "clean_text": 1}))
+claims = list(collection.find({}, {"Claim": 1, "Label": 1}))  # Fetch only required fields
 
 # ✅ Debug: Print sample MongoDB documents
 if claims:
-    print("🔍 Sample MongoDB Data:", claims[:5])  # Check if clean_text exists
+    print("🔍 Sample MongoDB Data:", claims[:5])  # Check what fields exist
 else:
     print("⚠️ No documents found in MongoDB!")
 
@@ -75,9 +75,14 @@ df = pd.DataFrame(claims)
 print("🔍 DataFrame Columns:", df.columns)
 
 # ✅ Handle Missing "clean_text" Column
-if "clean_text" not in df.columns:
-    print("⚠️ 'clean_text' column is missing! Creating an empty column.")
-    df["clean_text"] = df["Claim"].apply(lambda x: preprocess(x) if isinstance(x, str) else "")
+df["clean_text"] = df["Claim"].apply(lambda x: preprocess(x) if isinstance(x, str) else "")
+
+# ✅ Convert "Label" to numerical values for comparison
+if "Label" in df.columns:
+    df["is_fake"] = df["Label"].apply(lambda x: 1 if str(x).lower() == "false" else 0)
+else:
+    print("⚠️ Warning: 'Label' column is missing! Assigning default values.")
+    df["is_fake"] = 0  # Default to not fake if Label is missing
 
 # ✅ Run BERT Classification
 def predict_fake(text):
@@ -94,7 +99,6 @@ def predict_fake(text):
 
     return output.squeeze().item()
 
-
 df["probability_fake"] = df["clean_text"].apply(predict_fake)
 df["probability_real"] = 1 - df["probability_fake"]
 df["predicted_label"] = df["probability_fake"].apply(lambda x: 1 if x > 0.5 else 0)  # 1 = Fake, 0 = Real
@@ -102,6 +106,8 @@ df["predicted_label"] = df["probability_fake"].apply(lambda x: 1 if x > 0.5 else
 # ✅ Compare predictions with true labels
 df["correct"] = df["predicted_label"] == df["is_fake"]
 accuracy = df["correct"].mean() * 100
+print(df.head())
+print(df.columns)
 
 # ✅ Save classified claims
 df.to_csv("data/classified_claims.csv", index=False)
