@@ -61,7 +61,7 @@ if st.button("🔍 Fetch New Claims"):
     try:
         fetch_new_politifact_claims(min_claims=min_claims, max_pages=max_pages)  # ✅ Fetch & classify
         st.success(f"✅ Scraped and classified {min_claims} claims from up to {max_pages} pages!")
-        st.experimental_rerun()  # ✅ Refresh Streamlit to show results!
+        st.rerun()  
     except Exception as e:
         st.error(f"❌ Error fetching claims: {e}")
         
